@@ -37,7 +37,7 @@ print(document_proof.objects['signature'].hex())
 print("----------------------------------")
 
 # Change the authentication key
-authentication_jwk = jwk.JWK.generate(kty='OKP', crv='Ed25519')
+authentication_jwk = jwk.JWK.generate(kty='EC', crv='P-256')
 did_document = {
     'id': did,
     'authentication': [{
@@ -63,4 +63,22 @@ print("Document proof signature:")
 print(document_proof.objects['signature'].hex())
 print("----------------------------------")
 
+x509 = owner_registry.exportX509(authentication_jwk.export_to_pem(password=None))
+print("X509 certificate:\n", x509[0].decode())
+print("X509 certificate:\n", x509[1].decode())
 
+'''
+jws_payload_dict = {
+    'data': 'hello world!'
+}
+jws_header_dict = {
+    'alg': 'ES256',
+    'x5c': [x509[1].decode(), x509[0].decode()]
+}
+jws_payload = json.dumps(jws_payload_dict)
+jws_header = json.dumps(jws_header_dict)
+proof = jws.JWS(jws_payload.encode('utf-8'))
+proof.add_signature(authentication_jwk, None, jws_header,None)
+print("---------------------------------------------------------------")
+print(proof.serialize(compact=True))
+'''
