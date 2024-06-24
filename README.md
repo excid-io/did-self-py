@@ -1,5 +1,5 @@
 # A python implementation of did:self
-This is a python implementation of the [did:self method](https://github.com/mmlab-aueb/did-self)
+This is a python implementation of the [did:self method](https://github.com/excid-io/did-self)
 
 ## Installing from sources
 You can install from sources by invoking form the didself directory
