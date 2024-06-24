@@ -7,14 +7,14 @@ long_description = (here / 'README.md').read_text(encoding='utf-8')
 
 setup(
     name="didself",
-    version="2.0",
+    version="2.1",
     author="Nikos Fotiou",
     author_email="fotiou@aueb.gr",
     description="A did:self implementation",
     license='MIT',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/mmlab-aueb/did-self-py",
+    url="https://github.com/excid-io/did-self-py",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

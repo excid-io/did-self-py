@@ -63,4 +63,19 @@ print("Document proof signature:")
 print(document_proof.objects['signature'].hex())
 print("----------------------------------")
 
+#-------------------x509-------------------
+x509 = owner_registry.exportX509(authentication_jwk.export_to_pem(password=None))
+print("X509 certificate:\n", x509[0].decode())
+print("X509 certificate:\n", x509[1].decode())
+#------------------JWS----------------------
+x5c = owner_registry.exportX509(authentication_jwk.export_to_pem(password=None),"DER")
+jws_header_dict = {
+            'alg': "EdDSA",
+            'x5c': x5c
+        }
 
+jws_header = json.dumps(jws_header_dict)
+jws_payload="hello world"
+proof = jws.JWS(jws_payload.encode('utf-8'))
+proof.add_signature(authentication_jwk, None, jws_header,None)
+print("JWS\n", proof.serialize(compact=True))

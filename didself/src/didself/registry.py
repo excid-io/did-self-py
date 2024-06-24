@@ -98,7 +98,62 @@ class DIDSelfRegistry:
         self._did_document = did_document
         self._document_proof = document_proof
         self._did = did_document['id']
-    
+
+    def exportX509(self, public_key, format="PEM"):
+        from datetime import datetime, timezone, timedelta
+        from cryptography import x509
+        from cryptography.x509.oid import NameOID
+        from cryptography.hazmat.primitives.serialization import load_pem_public_key
+        from cryptography.hazmat.primitives.serialization import load_pem_private_key
+        from cryptography.hazmat.primitives import hashes, serialization
+        import base64 
+        subject = issuer = x509.Name([
+            
+        ])
+        root = x509.CertificateBuilder().subject_name(
+            subject
+        ).issuer_name(
+            issuer
+        ).public_key(
+            load_pem_public_key(self._owner_jwk.export_to_pem(private_key=False, password=None))
+        ).serial_number(
+            x509.random_serial_number()
+        ).not_valid_before(
+            datetime.now(timezone.utc)
+        ).not_valid_after(
+            # Our certificate will be valid for 10 days
+            datetime.now(timezone.utc) + timedelta(days=10)
+        ).add_extension(
+            x509.SubjectAlternativeName([x509.UniformResourceIdentifier(self._did)]),
+            critical=False,
+        # Sign our certificate with our private key
+        ).sign(load_pem_private_key(self._owner_jwk.export_to_pem(private_key=True, password=None), password=None), hashes.SHA256())
+
+        cert = x509.CertificateBuilder().subject_name(
+            subject
+        ).issuer_name(
+            issuer
+        ).public_key(
+            load_pem_public_key(public_key)
+        ).serial_number(
+            x509.random_serial_number()
+        ).not_valid_before(
+            datetime.now(timezone.utc)
+        ).not_valid_after(
+            # Our certificate will be valid for 10 days
+            datetime.now(timezone.utc) + timedelta(days=10)
+        ).add_extension(
+            x509.SubjectAlternativeName([x509.UniformResourceIdentifier(self._did)]),
+            critical=False,
+        # Sign our certificate with our private key
+        ).sign(load_pem_private_key(self._owner_jwk.export_to_pem(private_key=True, password=None), password=None), hashes.SHA256())
+        if (format=="DER"):
+            return [
+                base64.b64encode(cert.public_bytes(serialization.Encoding.DER)).decode(),
+                base64.b64encode(root.public_bytes(serialization.Encoding.DER)).decode()
+                ]
+        if (format=="PEM"):
+             return [root.public_bytes(serialization.Encoding.PEM), cert.public_bytes(serialization.Encoding.PEM)]
     
  
 
